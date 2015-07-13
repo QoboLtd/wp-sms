@@ -1,6 +1,11 @@
 <?php
-	include_once("../../../../../wp/wp-load.php");
-	
+	$wp_load_folder = '../../../../../wp/';
+	$wp_load = file_exists('../../../../../wp/wp-load.php');
+	if(!$wp_load){
+		$wp_load_folder = '../../../../../';
+	}
+	include_once($wp_load_folder.'wp-load.php');
+
 	$name	= trim($_REQUEST['name']);
 	$mobile	= trim($_REQUEST['mobile']);
 	$group	= trim($_REQUEST['group']);
@@ -10,7 +15,7 @@
 		echo json_encode(array('status' => 'error', 'response' => __('Please complete all fields', 'wp-sms')));
 		return;
 	}
-	
+
 	if(preg_match(WP_SMS_MOBILE_REGEX, $mobile) == false) {
 		echo json_encode(array('status' => 'error', 'response' => __('Please enter a valid mobile number', 'wp-sms')));
 		return;
@@ -31,7 +36,7 @@
 			}
 		}
 	}
-	
+
 	global $wpdb, $table_prefix, $sms, $date;
 	$check_mobile = $wpdb->query($wpdb->prepare("SELECT * FROM `{$table_prefix}sms_subscribes` WHERE `mobile` = '%s'", $mobile));
 	
