@@ -595,4 +595,5 @@ License: GPL2
 	include_once dirname( __FILE__ ) . '/newslleter.php';
 	include_once dirname( __FILE__ ) . '/features.php';
 	include_once dirname( __FILE__ ) . '/notifications.php';
-	
+	include_once dirname( __FILE__ ) . '/includes/ajax/wp-sms-subscribe.php';
+	include_once dirname( __FILE__ ) . '/includes/ajax/wp-sms-subscribe-activation.php';
