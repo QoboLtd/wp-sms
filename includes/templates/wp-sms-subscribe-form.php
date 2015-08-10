@@ -1,6 +1,8 @@
 <?php if(get_option('wp_subscribes_status')) { ?>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
+		var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
+
 		$("#wpsms-submit").click(function() {
 			$("#wpsms-result").hide();
 			subscriber = new Array();
@@ -18,25 +20,38 @@
 				$("#wpsms-submit").removeAttr('disabled');
 				$("#wpsms-submit").text("<?php _e('Subscribe', 'wp-sms'); ?>");
 			});
-			
-			$.get("<?php echo WP_SMS_DIR_PLUGIN; ?>includes/ajax/wp-sms-subscribe.php", {name:subscriber['name'], mobile:subscriber['mobile'], group:subscriber['groups'], type:subscriber['type']}, function(data, status){
-				var response = $.parseJSON(data);
-				
+
+			$.ajax({
+				url: ajaxurl,
+				type: "GET",
+				data: {
+					'action': 'wp_sms_subscribe',
+					'data': {
+						name: subscriber['name'],
+						mobile: subscriber['mobile'],
+						group: subscriber['groups'],
+						type: subscriber['type']
+					}
+				},
+				dataType: "json"
+			}).always(function(data) {
+				var response = data;
 				if(response.status == 'error') {
 					$("#wpsms-result").fadeIn();
 					$("#wpsms-result").html('<span class="wpsms-message-error">' + response.response + '</div>');
 				}
-				
+
 				if(response.status == 'success') {
 					$("#wpsms-result").fadeIn();
 					$("#wpsms-step-1").hide();
 					$("#wpsms-result").html('<span class="wpsms-message-success">' + response.response + '</div>');
 				}
-				
+
 				if(response.action == 'activation') {
 					$("#wpsms-step-2").show();
 				}
 			});
+
 		});
 		
 		<?php if(get_option('wp_subscribes_activation')) { ?>
@@ -53,21 +68,32 @@
 				$("#activation").removeAttr('disabled');
 				$("#activation").text("<?php _e('Activation', 'wp-sms'); ?>");
 			});
-			
-			$.get("<?php echo WP_SMS_DIR_PLUGIN; ?>includes/ajax/wp-sms-subscribe-activation.php", {mobile:subscriber['mobile'], activation:subscriber['activation']}, function(data, status){
-				var response = $.parseJSON(data);
-				
+
+			$.ajax({
+				url: ajaxurl,
+				type: "GET",
+				data: {
+					'action': 'wp_sms_subscribe',
+					'data': {
+						mobile:subscriber['mobile'],
+						activation:subscriber['activation']
+					}
+				},
+				dataType: "json"
+			}).always(function(data) {
+				var response = data;
 				if(response.status == 'error') {
 					$("#wpsms-result").fadeIn();
 					$("#wpsms-result").html('<span class="wpsms-message-error">' + response.response + '</div>');
 				}
-				
+
 				if(response.status == 'success') {
 					$("#wpsms-result").fadeIn();
 					$("#wpsms-step-2").hide();
 					$("#wpsms-result").html('<span class="wpsms-message-success">' + response.response + '</div>');
 				}
 			});
+
 		});
 		<?php } ?>
 	});
@@ -109,7 +135,7 @@
 		
 		<button class="wpsms-button" id="wpsms-submit"><?php _e('Subscribe', 'wp-sms'); ?></button>
 	</div>
-	
+
 	<div id="wpsms-step-2">
 		<div class="wpsms-subscribe-form">
 			<label><?php _e('Activation code:', 'wp-sms'); ?></label>
